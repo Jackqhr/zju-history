@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文军长征 · 浙江大学西迁之旅</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/900.css">
+<style>
+:root{
+  --paper:#f2e8d0; --paper2:#e7d9b8; --card:#faf3e0;
+  --ink:#3d3428; --ink2:#77674d; --ink3:#a2906e;
+  --red:#a83a2a; --red2:#c0492f; --seal:#b03a2e;
+  --jade:#5f7a64; --gold:#8a6d3b;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  font-family:'Noto Serif SC',serif; color:var(--ink);
+  background:
+    radial-gradient(1200px 500px at 70% -10%, #f7efdb 0%, transparent 60%),
+    linear-gradient(160deg,#e9dcbd 0%, #ddcaa2 100%);
+  overflow:hidden;
+}
+button{font-family:inherit;cursor:pointer;}
+
+/* ============ HUD ============ */
+#hud{
+  height:58px; display:flex; align-items:center; gap:16px; padding:0 16px;
+  background:linear-gradient(#4a3a26,#38291a);
+  color:#f0e4c8; box-shadow:0 3px 14px rgba(0,0,0,.35); position:relative; z-index:30;
+  border-bottom:2px solid #8a6d3b;
+}
+.hud-title{font-weight:900;font-size:19px;letter-spacing:2px;white-space:nowrap;}
+.hud-title .sub{font-size:12px;font-weight:400;opacity:.75;letter-spacing:1px;margin-left:8px;}
+.hud-stats{display:flex;gap:22px;margin-left:auto;}
+.stat{display:flex;flex-direction:column;align-items:center;line-height:1.15;}
+.stat b{font-size:16px;color:#f5d9a0;font-weight:700;white-space:nowrap;}
+.stat span{font-size:10px;opacity:.65;letter-spacing:1px;}
+.hud-btns{display:flex;gap:8px;}
+.hud-btns button{
+  background:rgba(255,244,214,.1); border:1px solid rgba(240,220,170,.35); color:#f0e4c8;
+  padding:6px 12px; border-radius:6px; font-size:12px; letter-spacing:1px; transition:.2s;
+}
+.hud-btns button:hover{background:rgba(255,244,214,.22);}
+
+/* ============ layout ============ */
+#main{display:grid;grid-template-columns:1fr 400px;height:calc(100vh - 58px);gap:10px;padding:10px;}
+#mapWrap{position:relative;border-radius:12px;overflow:hidden;
+  box-shadow:0 8px 30px rgba(60,40,15,.35), inset 0 0 0 2px rgba(140,110,60,.4);
+  background:var(--paper);}
+#map{width:100%;height:100%;display:block;}
+
+#legend{
+  position:absolute;left:12px;bottom:12px;background:rgba(250,243,224,.9);
+  border:1px solid rgba(140,110,60,.5);border-radius:8px;padding:8px 12px;font-size:11px;
+  color:var(--ink2);line-height:1.9;backdrop-filter:blur(2px);pointer-events:none;
+}
+.lg{display:flex;align-items:center;gap:6px;}
+.lg i{width:22px;height:0;border-top:3px solid var(--red);display:inline-block;border-radius:2px;}
+.lg i.dash{border-top:2px dashed #9a8a68;}
+.lg i.lock{border-top:2px dotted #b3a484;}
+.lg em{width:10px;height:10px;border-radius:50%;background:var(--red2);display:inline-block;box-shadow:0 0 0 3px rgba(192,73,47,.25);}
+
+#mapHint{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  background:rgba(58,42,26,.85);color:#f5e9cd;font-size:12px;letter-spacing:1px;
+  padding:6px 16px;border-radius:20px;pointer-events:none;transition:opacity .5s;
+}
+#btnReturn{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  display:none;background:linear-gradient(#c0492f,#98341f);color:#fff2d8;border:2px solid #f0d9a8;
+  font-size:15px;letter-spacing:3px;padding:10px 28px;border-radius:30px;font-weight:700;
+  box-shadow:0 6px 20px rgba(120,40,20,.5);animation:floaty 2s ease-in-out infinite;z-index:5;
+}
+@keyframes floaty{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}
+
+/* ============ sidebar ============ */
+#panel{display:flex;flex-direction:column;gap:10px;min-height:0;}
+#journey{
+  background:linear-gradient(#4a3a26,#3b2c1b);border-radius:12px;padding:10px 12px;color:#e9dcbc;
+  box-shadow:0 6px 18px rgba(60,40,15,.3);max-height:34%;overflow-y:auto;flex-shrink:0;
+}
+#journey h4{font-size:12px;letter-spacing:3px;opacity:.7;margin-bottom:8px;font-weight:400;}
+.jitem{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:.15s;position:relative;}
+.jitem:hover{background:rgba(255,240,200,.09);}
+.jitem.locked{opacity:.4;cursor:not-allowed;}
+.jitem.side{margin-left:14px;}
+.jitem.side::before{content:"支线";position:absolute;left:-14px;top:50%;transform:translateY(-50%);
+  font-size:9px;color:#c9a86a;border:1px solid rgba(201,168,106,.5);border-radius:3px;padding:0 2px;}
+.jdot{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;flex-shrink:0;border:1.5px solid rgba(240,220,170,.4);color:#f0dcae;}
+.jitem.done .jdot{background:var(--seal);border-color:#e8c9a0;color:#ffe9d0;box-shadow:0 0 8px rgba(192,73,47,.6);}
+.jitem.active .jdot{background:#c0492f;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{box-shadow:0 0 0 0 rgba(192,73,47,.6)}50%{box-shadow:0 0 0 6px rgba(192,73,47,0)}}
+.jinfo{min-width:0;}
+.jinfo b{font-size:13.5px;display:block;letter-spacing:1px;}
+.jinfo span{font-size:10.5px;opacity:.6;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.jkm{margin-left:auto;font-size:10px;color:#d8b878;white-space:nowrap;}
+
+#content{
+  flex:1;min-height:0;background:var(--card);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 6px 18px rgba(60,40,15,.25), inset 0 0 0 1px rgba(160,130,80,.35);
+}
+.phead{padding:14px 16px 0;border-bottom:1px solid rgba(160,130,80,.3);background:linear-gradient(#fbf5e4,#f4ead0);}
+.phead-top{display:flex;align-items:center;gap:12px;}
+.phead h2{font-size:22px;font-weight:900;letter-spacing:2px;}
+.phead .psub{font-size:12px;color:var(--ink2);margin-top:3px;letter-spacing:.5px;}
+.pseal{
+  margin-left:auto;width:46px;height:46px;border:3px solid var(--seal);border-radius:8px;color:var(--seal);
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;letter-spacing:1px;
+  writing-mode:vertical-rl;opacity:.25;transform:rotate(4deg);transition:.3s;flex-shrink:0;background:rgba(176,58,46,.04);
+}
+.pseal.earned{opacity:1;box-shadow:0 0 0 2px rgba(176,58,46,.25), inset 0 0 6px rgba(176,58,46,.3);animation:stampPop .45s cubic-bezier(.2,1.6,.4,1);}
+@keyframes stampPop{0%{transform:rotate(4deg) scale(2.1);opacity:0}60%{transform:rotate(-2deg) scale(.92);opacity:1}100%{transform:rotate(4deg) scale(1)}}
+.tabs{display:flex;gap:4px;margin-top:12px;}
+.tabs button{
+  flex:1;border:none;background:transparent;padding:9px 4px 11px;font-size:13.5px;color:var(--ink2);
+  border-bottom:3px solid transparent;letter-spacing:1px;transition:.2s;border-radius:6px 6px 0 0;
+}
+.tabs button:hover{background:rgba(168,58,42,.06);}
+.tabs button.active{color:var(--red);border-bottom-color:var(--red);font-weight:700;background:rgba(168,58,42,.07);}
+.pbody{flex:1;overflow-y:auto;padding:14px 16px 20px;scroll-behavior:smooth;}
+
+/* welcome */
+.welcome{text-align:center;padding-top:26px;}
+.wseal{width:74px;height:74px;margin:0 auto 16px;background:var(--seal);color:#fff2e0;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;writing-mode:vertical-rl;
+  letter-spacing:4px;transform:rotate(3deg);box-shadow:0 4px 14px rgba(150,50,30,.4), inset 0 0 10px rgba(0,0,0,.2);}
+.welcome h3{font-size:20px;letter-spacing:3px;margin-bottom:14px;}
+.welcome p{font-size:13px;line-height:2;color:var(--ink2);text-align:justify;margin-bottom:12px;}
+.welcome .hl{color:var(--red);}
+.howto{background:rgba(168,58,42,.06);border:1px dashed rgba(168,58,42,.35);border-radius:10px;padding:10px 12px;font-size:12.5px!important;}
+
+/* history */
+.hist-item{display:flex;gap:12px;padding:9px 2px;border-bottom:1px dashed rgba(160,130,80,.3);}
+.hist-item:last-of-type{border-bottom:none;}
+.hist-t{flex-shrink:0;width:92px;font-size:11.5px;font-weight:700;color:var(--red);padding-top:2px;letter-spacing:.5px;}
+.hist-s{font-size:13px;line-height:1.9;color:var(--ink);}
+.srcnote{margin-top:14px;font-size:10.5px;color:var(--ink3);line-height:1.7;border-top:1px solid rgba(160,130,80,.3);padding-top:10px;}
+
+/* dialogue */
+.dlg-note{font-size:10.5px;color:var(--ink3);margin-bottom:8px;letter-spacing:1px;}
+.dlg-stage{
+  background:linear-gradient(160deg,#3a2e20,#2a2015);border-radius:12px;padding:16px;min-height:210px;
+  color:#f0e6d0;cursor:pointer;position:relative;border:1px solid #6b5535;
+  box-shadow:inset 0 2px 12px rgba(0,0,0,.5);user-select:none;
+}
+.dlg-speaker{display:inline-block;font-size:13px;font-weight:700;letter-spacing:2px;color:#ffd9a0;
+  border:1px solid rgba(255,217,160,.5);padding:2px 12px;border-radius:4px;margin-bottom:12px;background:rgba(176,58,46,.35);}
+.dlg-speaker.narr{color:#b9c4b0;border-color:rgba(185,196,176,.4);background:rgba(95,122,100,.25);font-style:normal;}
+.dlg-text{font-size:14.5px;line-height:2.1;min-height:96px;letter-spacing:.5px;}
+.dlg-text .cursor{display:inline-block;width:8px;background:#ffd9a0;animation:blinkc .7s infinite;color:transparent;}
+@keyframes blinkc{0%,100%{opacity:1}50%{opacity:0}}
+.dlg-hint{position:absolute;right:14px;bottom:10px;font-size:11px;color:#c9b58a;animation:floaty2 1.4s infinite;}
+@keyframes floaty2{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(3px);opacity:.4}}
+.dlg-foot{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.dlg-progress{font-size:11px;color:var(--ink2);letter-spacing:1px;}
+.btn-mini{border:1px solid rgba(140,110,60,.5);background:rgba(250,243,224,.7);color:var(--ink2);
+  font-size:11px;padding:4px 10px;border-radius:6px;margin-left:auto;}
+.btn-mini:hover{background:#fff8e6;}
+
+/* quiz */
+.quiz-tag{display:inline-block;background:rgba(168,58,42,.1);color:var(--red);font-size:11px;
+  padding:3px 10px;border-radius:20px;border:1px solid rgba(168,58,42,.3);margin-bottom:12px;letter-spacing:2px;}
+.quiz-q{font-size:15.5px;font-weight:700;line-height:1.9;margin-bottom:16px;}
+.quiz-opt{
+  display:block;width:100%;text-align:left;background:#fff8e6;border:1.5px solid rgba(140,110,60,.45);
+  border-radius:10px;padding:11px 14px;font-size:13.5px;margin-bottom:10px;color:var(--ink);transition:.15s;letter-spacing:.5px;
+}
+.quiz-opt:hover{border-color:var(--red);background:#fdf3df;transform:translateX(3px);}
+.quiz-opt.right{background:#e7f0e2;border-color:var(--jade);color:#3c5a40;font-weight:700;}
+.quiz-opt.wrong{background:#f5e2da;border-color:var(--red2);animation:shake .35s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.quiz-exp{display:none;background:rgba(95,122,100,.12);border-left:3px solid var(--jade);padding:10px 12px;
+  font-size:12px;line-height:1.9;color:#40543f;border-radius:0 8px 8px 0;margin-top:6px;}
+.quiz-exp.show{display:block;animation:fadeUp .4s;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* big stamp fx */
+#stampFx{position:fixed;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;z-index:200;}
+#stampFx .big{
+  width:130px;height:130px;border:7px solid rgba(176,58,46,.85);border-radius:16px;color:rgba(176,58,46,.88);
+  display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;writing-mode:vertical-rl;letter-spacing:8px;
+  animation:bigStamp 1s cubic-bezier(.2,1.5,.4,1) forwards;background:rgba(250,240,220,.2);
+}
+@keyframes bigStamp{0%{transform:scale(2.6) rotate(-16deg);opacity:0}35%{transform:scale(1) rotate(5deg);opacity:1}
+  70%{transform:scale(1) rotate(5deg);opacity:1}100%{transform:scale(1.15) rotate(5deg);opacity:0}}
+
+/* overlays */
+.overlay{
+  position:fixed;inset:0;background:rgba(30,22,12,.72);backdrop-filter:blur(4px);z-index:100;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.overlay.hidden{display:none;}
+.ocard{
+  background:linear-gradient(165deg,#faf3e0,#efe2c2);border-radius:16px;max-width:640px;width:100%;
+  padding:30px 34px;box-shadow:0 20px 60px rgba(0,0,0,.5), inset 0 0 0 2px rgba(168,58,42,.5), inset 0 0 0 6px rgba(250,243,224,1), inset 0 0 0 7px rgba(168,58,42,.25);
+  max-height:92vh;overflow-y:auto;text-align:center;position:relative;
+}
+.ocard h1{font-size:30px;font-weight:900;letter-spacing:6px;color:var(--ink);margin:14px 0 4px;}
+.ocard .osub{font-size:13px;color:var(--red);letter-spacing:4px;margin-bottom:16px;}
+.ocard p{font-size:13.5px;line-height:2.1;color:var(--ink2);text-align:justify;margin-bottom:12px;}
+.btn-big{
+  background:linear-gradient(#c0492f,#98341f);color:#fff2d8;border:2px solid #e8c9a0;font-size:17px;
+  letter-spacing:6px;padding:12px 44px;border-radius:40px;font-weight:700;margin-top:8px;
+  box-shadow:0 6px 18px rgba(150,50,25,.45);transition:.2s;
+}
+.btn-big:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(150,50,25,.55);}
+.ostats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0;}
+.ostat{background:rgba(168,58,42,.07);border:1px solid rgba(168,58,42,.3);border-radius:10px;padding:10px 14px;min-width:110px;}
+.ostat b{display:block;font-size:18px;color:var(--red);}
+.ostat span{font-size:10.5px;color:var(--ink2);letter-spacing:1px;}
+.olyric{font-size:14px;color:var(--ink);letter-spacing:2px;line-height:2.2;margin:10px 0 4px;font-weight:700;}
+.olyric-src{font-size:11px;color:var(--ink3);margin-bottom:12px;}
+.ostamps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+.ostamp{width:44px;height:44px;border:2.5px solid var(--seal);border-radius:7px;color:var(--seal);display:flex;
+  align-items:center;justify-content:center;font-weight:900;font-size:13px;writing-mode:vertical-rl;transform:rotate(4deg);
+  background:rgba(176,58,46,.05);letter-spacing:1px;}
+.ostamp.dim{opacity:.22;}
+.osrc{font-size:10.5px;color:var(--ink3);line-height:1.8;text-align:left;border-top:1px dashed rgba(160,130,80,.4);padding-top:10px;margin-top:12px;}
+#introHero{width:100%;height:170px;display:block;margin-bottom:4px;}
+
+/* toast */
+#toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(50,36,20,.92);
+  color:#f3e7c9;font-size:13px;padding:8px 22px;border-radius:24px;opacity:0;pointer-events:none;transition:.3s;z-index:300;letter-spacing:1px;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* svg map styles */
+.nlabel{font-size:17px;font-weight:900;fill:#4a3a24;paint-order:stroke;stroke:rgba(246,238,216,.92);stroke-width:4px;letter-spacing:1px;}
+.nsub{font-size:10px;fill:#8a7450;paint-order:stroke;stroke:rgba(246,238,216,.85);stroke-width:3px;}
+.node{cursor:pointer;}
+.node.locked{cursor:not-allowed;}
+.node.locked .nlabel,.node.locked .nsub{fill:#a09478;opacity:.7;}
+.node.locked .ring{stroke:#9a8c6c;fill:#e8ddc2;}
+.node.locked .dot{fill:#9a8c6c;}
+.node .ring{fill:#f7ecd2;stroke:var(--red2);stroke-width:2.5;transition:.2s;}
+.node .dot{fill:var(--red2);}
+.node .pulse{fill:none;stroke:var(--red2);stroke-width:2;opacity:0;}
+.node.open .pulse{animation:ring 1.8s infinite;transform-box:fill-box;transform-origin:center;}
+@keyframes ring{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.1);opacity:0}}
+.node:hover .ring{stroke-width:4;}
+.node.side .ring{stroke:#7d6a3f;}
+.node.side .dot{fill:#a8873f;}
+.node.side.open .pulse{stroke:#a8873f;}
+.wplabel{font-size:9.5px;fill:#8a7a58;opacity:.85;paint-order:stroke;stroke:rgba(246,238,216,.7);stroke-width:2px;}
+.provlabel{font-size:52px;font-weight:900;fill:#6b5a3a;opacity:.09;letter-spacing:6px;}
+.rlabel{font-size:10.5px;fill:#5f867e;opacity:.8;letter-spacing:2px;}
+.sealabel{font-size:22px;fill:#5f867e;opacity:.35;letter-spacing:10px;font-weight:700;}
+
+/* responsive */
+@media (max-width:960px){
+  body{overflow:auto;}
+  #main{grid-template-columns:1fr;grid-template-rows:48vh auto;height:auto;}
+  #mapWrap{min-height:300px;}
+  .hud-title .sub{display:none;}
+  .hud-stats{gap:14px;}
+  #journey{max-height:none;}
+  #content{min-height:480px;}
+}
+@media (max-width:560px){
+  .hud-title{font-size:15px;}
+  .stat b{font-size:13px;}
+  .hud-btns button{padding:5px 8px;font-size:11px;}
+}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-thumb{background:rgba(140,110,60,.4);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+</style>
+</head>
+<body>
+
+<header id="hud">
+  <div class="hud-title">文军长征<span class="sub">浙江大学西迁之旅 · 1937—1946</span></div>
+  <div class="hud-stats">
+    <div class="stat"><b id="hudYear">1937年11月</b><span>当前时点</span></div>
+    <div class="stat"><b id="hudKm">0 km</b><span>跋涉行程</span></div>
+    <div class="stat"><b id="hudSeals">0 / 9</b><span>纪念印章</span></div>
+  </div>
+  <div class="hud-btns">
+    <button id="btnSound">🔔 音效</button>
+    <button id="btnHelp">玩法</button>
+    <button id="btnRestart">重启</button>
+  </div>
+</header>
+
+<main id="main">
+  <section id="mapWrap">
+    <svg id="map" viewBox="0 0 1320 800" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="mapHint">✦ 点击地图上的红色地点，开启西迁之旅</div>
+    <div id="legend">
+      <div class="lg"><em></em>可探索地点</div>
+      <div class="lg"><i></i>已走过的迁校路线</div>
+      <div class="lg"><i class="dash"></i>支线（龙泉分校 / 护书线）</div>
+      <div class="lg"><i class="lock"></i>尚未解锁</div>
+    </div>
+    <button id="btnReturn">⚑ 1946 · 凯旋回杭</button>
+  </section>
+
+  <aside id="panel">
+    <div id="journey">
+      <h4>── 行 程 单 ──</h4>
+      <div id="journeyList"></div>
+    </div>
+    <div id="content"></div>
+  </aside>
+</main>
+
+<!-- 开场 -->
+<div class="overlay" id="introOverlay">
+  <div class="ocard">
+    <svg id="introHero" viewBox="0 0 640 170">
+      <defs>
+        <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f6ecd4"/><stop offset="1" stop-color="#ecd9b0"/>
+        </linearGradient>
+      </defs>
+      <rect width="640" height="170" fill="url(#skyG)" rx="10"/>
+      <circle cx="510" cy="48" r="26" fill="#c0492f" opacity=".85"/>
+      <path d="M0,120 Q80,70 160,110 T330,95 T500,115 T640,90 L640,170 L0,170 Z" fill="#9aa88c" opacity=".45"/>
+      <path d="M0,140 Q100,95 210,132 T420,120 T640,138 L640,170 L0,170 Z" fill="#6f7d5e" opacity=".55"/>
+      <path d="M0,158 Q120,125 260,152 T520,142 T640,158 L640,170 L0,170 Z" fill="#4c5841" opacity=".75"/>
+      <path d="M30,150 C140,128 240,150 330,132 C420,114 520,132 620,112" fill="none" stroke="#a83a2a" stroke-width="2.5" stroke-dasharray="7 6" opacity=".85"/>
+      <g fill="#3a2e1e" opacity=".92">
+        <g transform="translate(120,132)"><circle cx="0" cy="-12" r="3.6"/><rect x="-1.6" y="-8" width="3.2" height="10" rx="1.4"/><rect x="-9" y="-14" width="18" height="1.6" rx=".8"/><circle cx="-9" cy="-12" r="2.6"/><circle cx="9" cy="-12" r="2.6"/></g>
+        <g transform="translate(170,136)"><circle cx="0" cy="-12" r="3.6"/><rect x="-1.6" y="-8" width="3.2" height="10" rx="1.4"/><rect x="-9" y="-14" width="18" height="1.6" rx=".8"/><circle cx="-9" cy="-12" r="2.6"/><circle cx="9" cy="-12" r="2.6"/></g>
+        <g transform="translate(230,140)"><circle cx="0" cy="-12" r="3.6"/><rect x="-1.6" y="-8" width="3.2" height="10" rx="1.4"/><rect x="-9" y="-14" width="18" height="1.6" rx=".8"/><circle cx="-9" cy="-12" r="2.6"/><circle cx="9" cy="-12" r="2.6"/></g>
+        <g transform="translate(300,133)"><circle cx="0" cy="-12" r="3.6"/><rect x="-1.6" y="-8" width="3.2" height="10" rx="1.4"/><rect x="-9" y="-14" width="18" height="1.6" rx=".8"/><circle cx="-9" cy="-12" r="2.6"/><circle cx="9" cy="-12" r="2.6"/></g>
+        <g transform="translate(365,127)"><circle cx="0" cy="-12" r="3.6"/><rect x="-1.6" y="-8" width="3.2" height="10" rx="1.4"/><rect x="-9" y="-14" width="18" height="1.6" rx=".8"/><circle cx="-9" cy="-12" r="2.6"/><circle cx="9" cy="-12" r="2.6"/></g>
+      </g>
+      <g transform="translate(455,110)"><rect x="-.8" y="-24" width="1.8" height="26" fill="#3a2e1e"/><path d="M1,-24 L16,-20 L1,-14 Z" fill="#c0492f"/></g>
+    </svg>
+    <h1>文军长征</h1>
+    <div class="osub">── 浙江大学西迁 · 互动校史地图 ──</div>
+    <p>1937年，抗战烽火逼近杭州。浙江大学校长竺可桢率千余名师生举校西迁，历时两年三个月，途经浙、赣、湘、粤、桂、黔六省，跋涉2600余公里，最终定址贵州遵义、湄潭、永兴，坚持办学七年，直至1946年凯旋回杭。这段征程，被誉为中国高等教育史上的「文军长征」。</p>
+    <p class="howto">🎮 <b>玩法：</b>沿地图点击<span class="hl">红色地点</span> → 阅读「史海档案」→ 体验「情景对话」→ 通过「求是问答」即可盖下纪念印章、解锁下一站。另有龙泉分校、贵阳地母洞两条支线等你发现。集齐印章，完成凯旋！</p>
+    <button class="btn-big" id="btnStart">启 程 西 迁</button>
+    <div class="osrc">※ 本页史实内容整理自浙江大学官网（zju.edu.cn）、中文维基百科「国立浙江大学西迁」条目、抗战纪念网等公开史料；「情景对话」为依据史料进行的艺术再现，仅供学习参考。</div>
+  </div>
+</div>
+
+<!-- 结局 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="ocard">
+    <div class="wseal" style="margin:0 auto 12px;">凯旋</div>
+    <h1 style="font-size:26px;">文军长征 · 功德圆满</h1>
+    <div class="osub">1946年 · 浙江大学复员回杭</div>
+    <p>1945年10月，龙泉分校师生率先启程回杭；1946年5月7日，遵义总校踏上归途，经贵阳、玉屏出贵州。至当年10月，浙大贵州各校区全部完成回迁。九年烽火，弦歌不辍——西迁时仅有3学院16系、约460名学生的浙江大学，归来时已发展为拥有7个学院、27个学系的综合性大学。</p>
+    <div class="ostats">
+      <div class="ostat"><b>2600+ km</b><span>西迁行程（史料）</span></div>
+      <div class="ostat"><b>六省</b><span>浙赣湘粤桂黔</span></div>
+      <div class="ostat"><b>七年</b><span>遵义·湄潭·永兴办学</span></div>
+      <div class="ostat"><b id="endSeals">0 / 9</b><span>收集印章</span></div>
+    </div>
+    <div class="olyric">「大不自多，海纳江河。惟学无际，际于天地。」</div>
+    <div class="olyric-src">—— 浙江大学校歌《大不自多》（1938年定校训同时议定，马一浮词、应尚能曲）</div>
+    <div class="ostamps" id="endStamps"></div>
+    <button class="btn-big" id="btnAgain">再 走 一 遍</button>
+    <button class="btn-mini" id="btnCloseEnd" style="margin:14px 0 0 12px;">返回地图</button>
+    <div class="osrc">※ 史实整理自浙江大学官网、中文维基百科「国立浙江大学西迁」、抗战纪念网等公开资料；对话与数值为教学演绎，行程公里数为示意估算（建德→泰和段752公里为史料记载）。</div>
+  </div>
+</div>
+
+<!-- 帮助 -->
+<div class="overlay hidden" id="helpOverlay">
+  <div class="ocard" style="max-width:520px;text-align:left;">
+    <h1 style="font-size:22px;text-align:center;">玩法说明</h1>
+    <div class="osub" style="text-align:center;">── 如何走完文军长征 ──</div>
+    <p>① 地图上<b style="color:var(--red)">闪红光的地点</b>可以点击进入；灰色地点需先完成前一站解锁。</p>
+    <p>② 每个地点含三个板块：<b>史海档案</b>（真实校史时间线）、<b>情景对话</b>（依据史料改编的剧场，点击推进）、<b>求是问答</b>（答对即可盖章）。</p>
+    <p>③ 盖章后行程公里数累计，下一站自动解锁，迁校队伍将沿路线行进。</p>
+    <p>④ 完成泰和后可解锁支线「贵阳·地母洞」（四库全书护书线）；完成宜山后解锁支线「龙泉·芳野」（龙泉分校）。</p>
+    <p>⑤ 走完全部主线七站后，点击地图上出现的「⚑ 凯旋回杭」完成征程，查看你的纪念证书。</p>
+    <div style="text-align:center;margin-top:16px;"><button class="btn-big" id="btnCloseHelp" style="font-size:15px;padding:9px 36px;">知道了</button></div>
+  </div>
+</div>
+
+<div id="stampFx"></div>
+<div id="toast"></div>
+
+<script>
+/* ================= 工具 ================= */
+const $=s=>document.querySelector(s);
+const MAPW=1320, MAPH=800;
+const px=lon=>(lon-105.6)*82;
+const py=lat=>(31.6-lat)*96;
+const P=(lon,lat)=>[px(lon),py(lat)];
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+/* ================= 音效 ================= */
+let audioCtx=null, soundOn=true;
+function actx(){ if(!audioCtx){ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); } if(audioCtx.state==='suspended')audioCtx.resume(); return audioCtx; }
+function tone(f,d,type,v,delay){ if(!soundOn)return; try{ const c=actx(); const o=c.createOscillator(),g=c.createGain();
+  o.type=type||'sine'; o.frequency.value=f; const t0=c.currentTime+(delay||0);
+  g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(v||0.12,t0+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+d); o.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0+d+0.06);}catch(e){} }
+const sfxClick =()=>tone(760,0.06,'triangle',0.07);
+const sfxType  =()=>tone(1300,0.015,'square',0.012);
+const sfxStamp =()=>{tone(110,0.2,'sine',0.3);tone(66,0.28,'sine',0.24,0.02);};
+const sfxRight =()=>{tone(659,0.12,'triangle',0.14);tone(880,0.16,'triangle',0.14,0.11);tone(1175,0.22,'triangle',0.12,0.22);};
+const sfxWrong =()=>tone(196,0.22,'sawtooth',0.07);
+const sfxUnlock=()=>{tone(523,0.1,'sine',0.1);tone(659,0.1,'sine',0.1,0.1);tone(784,0.18,'sine',0.12,0.2);};
+const sfxStep  =()=>tone(160,0.05,'sine',0.05);
+
+/* ================= 数据（依据公开史料整理） ================= */
+const NODES=[
+{id:'hz',name:'杭州',sub:'西迁起点 · 国立浙江大学本部',year:'1937年11月',lon:120.15,lat:30.27,type:'main',order:0,km:0,stamp:'啓行',
+ lab:{dx:16,dy:-14,anchor:'start'},
+ hist:[
+  {t:'1937年9月',s:'全面抗战爆发后，浙江大学一年级新生先行迁往浙西天目山（於潜）禅源寺一带上课。'},
+  {t:'1937年10月5日',s:'竺可桢赴建德梅城考察后主持召开校务会议，决定将学校迁往建德。'},
+  {t:'1937年11月5日',s:'日军在金山卫登陆，距杭州仅约100公里，形势危急，迁校刻不容缓。'},
+  {t:'1937年11月11日起',s:'一千余名师生员工分三批启程西迁。此时浙大仅有文理、工、农3个学院16个学系，随校西迁学生约460名。'},
+  {t:'历史评价',s:'西迁历经浙、赣、湘、粤、桂、黔六省，行程2600余公里，彭真称之为「文军长征」。'}],
+ dlg:[
+  {sp:'旁白',tx:'1937年11月，杭州。日军在金山卫登陆的消息传来，距杭州只有一百多公里，校园里一片紧张。'},
+  {sp:'竺可桢',tx:'诸位不要慌。学校已经决定：自11月11日起，师生员工分三批出发，西迁建德梅城。'},
+  {sp:'学生',tx:'校长，图书仪器怎么办？那可是学校的命根子！'},
+  {sp:'竺可桢',tx:'图书仪器随行搬运。走水路，是为了节省开支；走夜路，是为了躲避空袭。书在、师生在，浙江大学就在。'},
+  {sp:'旁白',tx:'就这样，一支千余人的队伍踏上了漫漫征途。等待他们的，是两年多的颠沛流离、六省山河、两千六百余公里路。'}],
+ quiz:{q:'浙江大学于哪一年开始举校西迁？',opts:['1931年','1937年','1940年'],ans:1,
+   exp:'1937年11月5日日军在金山卫登陆，杭州告急；11月11日起浙大师生分三批启程迁往建德，西迁由此拉开序幕。'}},
+
+{id:'jd',name:'建德·梅城',sub:'一迁 · 新安江畔的第一站',year:'1937年11月 — 1938年1月',lon:119.28,lat:29.47,type:'main',order:1,km:110,stamp:'梅城',
+ lab:{dx:14,dy:22,anchor:'start'},
+ hist:[
+  {t:'1937年11月',s:'师生分批抵达建德县治梅城，借用已停办的严州中学校舍作教室与宿舍，天目山师生也全部到达，新安江畔重闻读书声。'},
+  {t:'迁校之道',s:'走水路以省开支、走夜路以避空袭——竺可桢对搬迁线路与运输作了细致安排。'},
+  {t:'国宝同行',s:'浙大杭州本部协同浙江省图书馆，将文澜阁《四库全书》一同西迁，守护中华文化命脉。'},
+  {t:'1937年12月底',s:'杭州沦陷，梅城距火线日近，浙大被迫再度启程，经金华、玉山、樟树向江西转移。'}],
+ dlg:[
+  {sp:'旁白',tx:'建德梅城，新安江畔。严州中学的旧校舍里，浙大重新点亮了灯火。'},
+  {sp:'学生甲',tx:'教室虽是借来的，可比夜里摸山路时强多了——总算能摊开书本了。'},
+  {sp:'图书馆员',tx:'同学们，文澜阁《四库全书》已随浙江省图书馆一同运出杭州。那是世界上最大的手抄丛书，一册都不能有失！'},
+  {sp:'竺可桢',tx:'很好。文化的火种、读书的种子，一样都不能丢。安顿下来，明日照常上课。'},
+  {sp:'旁白',tx:'然而好景不长。12月底杭州沦陷，梅城已非安放书桌之地，浙大人再一次背起行囊。'}],
+ quiz:{q:'浙大西迁的第一站（首迁之地）是哪里？',opts:['建德梅城','江西泰和','广西宜山'],ans:0,
+   exp:'1937年11月，浙大师生分三批迁至建德梅城，借用严州中学校舍办学，这是西迁的第一站。'}},
+
+{id:'th',name:'吉安·泰和',sub:'二迁 · 赣江畔的八个月',year:'1938年1月 — 9月',lon:114.90,lat:26.80,type:'main',order:2,km:752,stamp:'築堤',
+ lab:{dx:-16,dy:-14,anchor:'end'},
+ hist:[
+  {t:'1938年1月20日前后',s:'师生陆续抵达江西。此段行程共752公里，平均每天行进约30公里。'},
+  {t:'临时校址',s:'校址设于泰和县城西2.5公里的上田村，借用大原书院、华阳书院两座古书院办学，并创设澄江学校。'},
+  {t:'造福一方',s:'1938年4月底至6月底，浙大出技术、地方出工料，筑成全长1.5公里的防洪堤，百姓称为「浙江大学堤」；麂山旧码头加固扩建为「浙大码头」，另开辟沙村示范垦殖场。'},
+  {t:'1938年7月',s:'日军攻占九江，江西形势吃紧，浙大决定再度西迁广西宜山。'}],
+ dlg:[
+  {sp:'旁白',tx:'江西泰和上田村，古书院里又响起了上课铃声。只是赣江水患，年年侵袭这片土地。'},
+  {sp:'乡民',tx:'竺校长，赣江年年涨水，田淹了、房子塌了，我们苦啊！'},
+  {sp:'竺可桢',tx:'浙大出技术，县政府和省水利局出工出料，我们一起修一道防洪堤！'},
+  {sp:'旁白',tx:'1938年4月底开工、6月底完工，一道1.5公里长的大堤护住了两岸田畴，当地百姓称它「浙江大学堤」。'},
+  {sp:'学生乙',tx:'没想到我们流亡读书，第一课竟是修堤、办学、垦荒。'},
+  {sp:'竺可桢',tx:'大学不是象牙塔。求是二字，要写在祖国的大地上。'}],
+ quiz:{q:'浙大师生在泰和帮助修建的防洪堤，被当地百姓称作什么？',opts:['求是堤','浙江大学堤','澄江堤'],ans:1,
+   exp:'1938年4—6月，浙大负责技术、地方出资出劳，筑成1.5公里防洪堤，百姓感念称之为「浙江大学堤」，还扩建了「浙大码头」、创设澄江学校、开辟沙村垦殖场。'}},
+
+{id:'ys',name:'宜山',sub:'三迁 · 「求是」校训诞生地',year:'1938年9月 — 1939年冬',lon:108.66,lat:24.49,type:'main',order:3,km:880,stamp:'求是',
+ lab:{dx:18,dy:8,anchor:'start'},
+ hist:[
+  {t:'1938年9月25日',s:'竺可桢抵达广西宜山，多次与广西大学校长马君武会面，商讨办学选址与学术交流。'},
+  {t:'1938年11月1日',s:'浙大在宜山标营大草棚餐厅举行开学典礼，竺可桢发表《王阳明先生与大学生的典范》演讲。'},
+  {t:'1938年11月19日',s:'校务会议决定以「求是」为校训，并议定请马一浮撰写校歌歌词、应尚能谱曲，校歌题名《大不自多》。'},
+  {t:'竺可桢日记',s:'「决定校训为求是两字」——语出王阳明「君子之学，岂有心于同异，唯求其是而已」。竺可桢将求是阐释为奋斗精神、牺牲精神、革命精神与科学精神，强调「以真理为依归」。'},
+  {t:'1939年2月5日',s:'日机轰炸宜山标营浙大校舍，投弹118枚，学校损失惨重，师生仍坚持教学。'},
+  {t:'1939年11月',s:'南宁陷落，浙大再次西迁贵州，于1940年初定址遵义、湄潭、永兴。'}],
+ dlg:[
+  {sp:'旁白',tx:'1938年11月19日夜，广西宜山标营，一盏油灯下，校务会议正在进行。'},
+  {sp:'教授',tx:'校长，学校三度迁徙、颠沛两年，师生人心浮动，当立校训以定其心、聚其志。'},
+  {sp:'竺可桢',tx:'我提议，就用「求是」二字。它出自王阳明先生——「君子之学，岂有心于同异，唯求其是而已。」'},
+  {sp:'竺可桢',tx:'求是，不只是埋头读书，更是奋斗精神、牺牲精神、革命精神、科学精神，以真理为依归。'},
+  {sp:'旁白',tx:'同次会议决定请马一浮先生撰校歌歌词、应尚能先生谱曲。《大不自多》自此传唱：「大不自多，海纳江河。惟学无际，际于天地……」'},
+  {sp:'旁白',tx:'数月之后，日机的118枚炸弹落在标营校舍。废墟之上，读书声未断，校歌声未歇。'}],
+ quiz:{q:'浙江大学校歌《大不自多》的歌词由谁撰写？',opts:['马一浮','应尚能','竺可桢'],ans:0,
+   exp:'1938年11月19日宜山校务会议在确立「求是」校训的同时，议定请国学家马一浮撰写校歌歌词《大不自多》，音乐家应尚能谱曲。'}},
+
+{id:'zy',name:'遵义',sub:'终迁 · 大学本部所在',year:'1940年初 — 1946年',lon:106.93,lat:27.73,type:'main',order:4,km:880,stamp:'弦歌',
+ lab:{dx:-16,dy:-16,anchor:'end'},
+ hist:[
+  {t:'1940年初',s:'辗转两年三个月后，浙大终于定址贵州，大学本部（总办公室）设在遵义城内「子弹库」。'},
+  {t:'三地办学',s:'文学院、工学院及师范学院文科系设遵义；理学院、农学院及师范学院理科系设湄潭；一年级（及先修班）设永兴。'},
+  {t:'七年坚守',s:'浙大在遵义、湄潭、永兴坚持办学七年，弦歌不辍，学校在战火中反而发展壮大。'},
+  {t:'1946年5月7日',s:'遵义总校启程回杭，经贵阳、玉屏出贵州；至1946年10月，贵州各校区全部完成回迁。'},
+  {t:'规模之变',s:'1946年秋复员时，浙大已从西迁之初的3学院16系、约460名学生，发展为文、法、理、工、农、医、师范7个学院、27个学系、1个研究院的综合性大学。'}],
+ dlg:[
+  {sp:'旁白',tx:'1940年初，历经四次迁徙的浙江大学，终于在贵州遵义停下了脚步，本部设进城内旧时的子弹库。'},
+  {sp:'学生丙',tx:'校长，我们总算有一张安放得下的书桌了吗？'},
+  {sp:'竺可桢',tx:'书桌安得下，学问要做大。文学院、工学院留在遵义，理学院、农学院去湄潭，一年级迁往永兴——每一堂课，都要认认真真地办。'},
+  {sp:'学生丙',tx:'听说湄潭的校舍，是文庙和祠堂？'},
+  {sp:'竺可桢',tx:'庙堂能供神，也能供科学。条件越苦，越要求是。国家的前途，就寄托在诸位的课桌与实验台上。'},
+  {sp:'旁白',tx:'此后七年，这座黔北小城的灯火，夜夜为浙大而明。'}],
+ quiz:{q:'浙大贵州时期，大学本部（总办公室）设在哪里？',opts:['贵阳','遵义','都匀'],ans:1,
+   exp:'1940年初浙大定址贵州，本部设于遵义「子弹库」；文、工两院在遵义，理、农两院在湄潭，一年级在永兴。'}},
+
+{id:'mt',name:'湄潭',sub:'理学院·农学院 · 「东方剑桥」',year:'1940 — 1946年',lon:107.49,lat:27.76,type:'main',order:5,km:75,stamp:'格物',
+ lab:{dx:12,dy:-18,anchor:'start'},
+ hist:[
+  {t:'借庙办学',s:'理学院、农学院与师范学院理科系设于湄潭：文庙作办公室、图书馆及部分教室与学生宿舍，教授借住民宅会馆，唐家祠堂等皆成教研场所。'},
+  {t:'谈家桢与遗传学',s:'谈家桢在破旧祠堂中借煤油灯微光用显微镜研究果蝇遗传学。他后来回忆：「我一生在科学研究上有一些重要代表性论文，就是在湄潭写成的。」'},
+  {t:'王淦昌与中微子',s:'1941年，王淦昌在湄潭完成论文《关于探测中微子的一个建议》，提出以K电子俘获方法探寻中微子，1942年1月发表于美国《物理评论》；美国物理学家艾伦随后依此思路开展实验。'},
+  {t:'湄江吟社',s:'苏步青坚持微分几何研究；苏步青、祝廉先、郑晓沧等教授组织「湄江吟社」，江畔品茗唱和，诗声与书声相闻。'},
+  {t:'李约瑟来访',s:'1944年4月与10月，英国生物化学家、科学史家李约瑟两度到访遵义、湄潭的浙江大学，后撰文称浙大为中国最好的大学之一，赞誉其为「东方剑桥」。'}],
+ dlg:[
+  {sp:'旁白',tx:'湄潭唐家祠堂的深夜，煤油灯如豆。谈家桢教授俯身在显微镜前，观察果蝇的染色体。'},
+  {sp:'学生',tx:'先生，这灯比防空洞里的还暗，真能看清么？'},
+  {sp:'谈家桢',tx:'灯暗，眼睛不能暗。遗传的秘密，就藏在这几微米之间。摩尔根先生能做的，我们在湄潭一样能做。'},
+  {sp:'旁白',tx:'同一座县城里，王淦昌在没有实验设备的条件下，纯凭推算写出《关于探测中微子的一个建议》，1942年1月发表于美国《物理评论》。'},
+  {sp:'旁白',tx:'1944年，李约瑟两次到访湄潭。他看到祠堂里的实验室、煤油灯下的论文，回国后撰文盛赞浙大是「东方剑桥」。'},
+  {sp:'谈家桢',tx:'多年以后我可以自豪地说：我一生在科学研究上有一些重要代表性论文，就是在湄潭写成的。'}],
+ quiz:{q:'1944年到访湄潭、赞誉浙江大学为「东方剑桥」的英国学者是？',opts:['李约瑟','杜威','罗素'],ans:0,
+   exp:'1944年4月与10月，李约瑟两度访问在遵义、湄潭办学的浙江大学，后在刊物上撰文称浙大为中国最好的大学之一，誉之为「东方剑桥」。'}},
+
+{id:'yx',name:'永兴',sub:'浙大一年级「新生村」',year:'1940 — 1946年',lon:107.65,lat:27.42,type:'main',order:6,km:20,stamp:'晨讀',
+ lab:{dx:14,dy:20,anchor:'start'},
+ hist:[
+  {t:'地理',s:'永兴镇位于湄潭县城以南约20公里，是浙大一年级与先修班办学之地，人称「浙大新生村」。'},
+  {t:'1940年秋',s:'一年级及先修班学生自贵阳青岩迁至永兴，借用当地祠堂、庙宇与民房作教室、宿舍。'},
+  {t:'艰苦求学',s:'煤油灯、旧木桌，教授们往返于遵义、湄潭之间前来授课——烽火之中，一年级的基础课从未中断。'}],
+ dlg:[
+  {sp:'旁白',tx:'永兴镇，距湄潭县城二十公里。1940年秋，浙大一年级的新生们从贵阳青岩辗转来到这里。'},
+  {sp:'新生',tx:'学长，听说我们的教室和宿舍，全是借来的祠堂和庙宇？'},
+  {sp:'学长',tx:'是啊。点是煤油灯，用的是旧木桌，可教授们从遵义、湄潭赶过来给我们上课，一堂也没落下。'},
+  {sp:'新生',tx:'来报到之前，我一直在想竺校长的那两个问题——「到浙大来做什么？将来毕业后要做什么样的人？」'},
+  {sp:'学长',tx:'那你想清楚了吗？'},
+  {sp:'新生',tx:'国难当头，读书就是救国。我想，这就是校长说的「求是」。'},
+  {sp:'旁白',tx:'晨光里，永兴镇的祠堂中传出朗朗书声。七年之间，一届届新生从这里走向遵义、湄潭的院系课堂。'}],
+ quiz:{q:'西迁时期，浙大在永兴镇主要安排哪类学生就读？',opts:['一年级及先修班学生','研究生','医学院高年级学生'],ans:0,
+   exp:'浙大贵州办学的总体布局是：文、工两院在遵义，理、农两院在湄潭，一年级（及先修班）设在永兴，1940年秋由贵阳青岩迁来。'}},
+
+{id:'gy',name:'贵阳·地母洞',sub:'支线 · 文澜阁《四库全书》秘藏地',year:'1938 — 1944年',lon:106.63,lat:26.65,type:'side',unlockAfter:'th',km:0,stamp:'護書',
+ lab:{dx:12,dy:26,anchor:'start'},
+ hist:[
+  {t:'书随校走',s:'抗战爆发后，文澜阁《四库全书》在浙大与浙江省图书馆的协同下西迁，竺可桢派出专人专车相助；图书几经辗转、长途跋涉，于1938年3月运抵贵阳。'},
+  {t:'秘藏地母洞',s:'1939年4月至1944年12月，全书秘藏于贵阳郊外的地母洞中。'},
+  {t:'护书如宝',s:'洞内潮湿，护书人员修筑防潮木台、搭建防滴水斜棚、派驻警卫，并建立春秋两季曝晒、撒石灰防潮等保护制度。'},
+  {t:'屡屡查勘',s:'浙大迁至遵义、湄潭办学后，竺可桢仍多次专程赴地母洞查看藏书；1944年冬战局紧张，阁书改运重庆暂存，抗战胜利后完整运返杭州。'}],
+ dlg:[
+  {sp:'旁白',tx:'贵阳郊外，地母洞。跋涉两千余公里而来的文澜阁《四库全书》，自1939年4月起秘藏于此。'},
+  {sp:'竺可桢',tx:'洞中潮湿。木台要垫高防潮，斜棚要挡滴水，春秋两季曝晒、撒石灰，一样都不可懈怠。'},
+  {sp:'图书馆员',tx:'校长放心。人在书在——书在，文化的根就在。'},
+  {sp:'竺可桢',tx:'这部书与浙大一同流亡，一同跋涉。诸位护书，亦是护国。'},
+  {sp:'旁白',tx:'1944年冬，战局吃紧，阁书转运重庆；抗战胜利后，《四库全书》完整归杭，文澜阁书与浙大师生一样，走完了这场文化长征。'}],
+ quiz:{q:'曾秘藏于贵阳郊外地母洞的典籍是？',opts:['文澜阁《四库全书》','《永乐大典》','《赵城金藏》'],ans:0,
+   exp:'在浙大与浙江省图书馆协同护送下，文澜阁《四库全书》于1938年3月抵贵阳，1939年4月至1944年12月秘藏地母洞，竺可桢多次前往查勘。'}},
+
+{id:'lq',name:'龙泉·芳野',sub:'支线 · 浙大龙泉分校',year:'1939 — 1945年',lon:119.14,lat:28.07,type:'side',unlockAfter:'ys',km:0,stamp:'芳野',
+ lab:{dx:14,dy:8,anchor:'start'},
+ hist:[
+  {t:'缘起',s:'交通阻绝，浙、闽、沪、皖一带大批青年学子无法赴西南大后方升学。'},
+  {t:'1939年2月',s:'竺可桢从宜山派教务长郑晓沧、史地系教授陈训慈返回浙江筹备分校。'},
+  {t:'曾家大屋',s:'分校设于丽水龙泉芳野（坊下村），乡绅曾水清闻讯让出自家新屋；1939年10月1日开学，初仅设一年级。'},
+  {t:'山中大学',s:'分校办学近七年，共培养1200余名学生；1945年10月，龙泉分校师生率先启程回杭，11月在杭州复课。'}],
+ dlg:[
+  {sp:'旁白',tx:'1939年，浙江龙泉芳野。为让沦陷区与交通线上的青年有书可读，竺可桢派郑晓沧、陈训慈东返筹办分校。'},
+  {sp:'曾水清',tx:'浙大肯来我们芳野办学，是山乡的福气！我家新盖的屋子，愿意让出来做校舍！'},
+  {sp:'郑晓沧',tx:'多谢曾先生！在这曾家大屋里，我们照样开出浙大的课程。'},
+  {sp:'学生',tx:'没想到在这偏僻山村，也能听浙大教授讲课、读浙大的书。'},
+  {sp:'旁白',tx:'1939年10月1日，分校开学。此后近七年，这所「山村大学」培养出1200余名学生；1945年10月，他们率先踏上回杭之路。'}],
+ quiz:{q:'浙江大学龙泉分校的校址位于？',opts:['龙泉芳野曾家大屋','贵阳青岩古镇','泰和上田村'],ans:0,
+   exp:'1939年，浙大龙泉分校设于龙泉芳野（坊下村）曾家大屋，由乡绅曾水清让出自家新屋，郑晓沧、陈训慈主持筹办，办学近七年培养学生1200余名。'}}
+];
+const byId={}; NODES.forEach(n=>byId[n.id]=n);
+const MAIN_ORDER=['hz','jd','th','ys','zy','mt','yx'];
+const JOURNEY_ORDER=['hz','jd','th','gy','ys','lq','zy','mt','yx'];
+
+/* 途经点（仅作地理装饰与路径） */
+const WAYPOINTS=[
+ {n:'金华',x:1152.1,y:241.9},{n:'玉山',x:1032.4,y:283.2},{n:'樟树',x:815.1,y:341.8},{n:'吉安',x:769.2,y:431.0},
+ {n:'衡阳',x:575.6,y:452.2},{n:'永州',x:492.8,y:497.3},{n:'桂林',x:384.6,y:607.7},{n:'柳州',x:313.2,y:697.9},
+ {n:'榕江',x:239.4,y:544.3},{n:'都匀',x:157.4,y:512.6}
+];
+const np=id=>{const n=byId[id];return P(n.lon,n.lat);};
+const SEGMENTS=[
+ [np('hz'),np('jd')],
+ [np('jd'),[1152.1,241.9],[1032.4,283.2],[815.1,341.8],[769.2,431.0],np('th')],
+ [np('th'),[575.6,452.2],[492.8,497.3],[384.6,607.7],[313.2,697.9],np('ys')],
+ [np('ys'),[239.4,544.3],[157.4,512.6],np('gy'),np('zy')],
+ [np('zy'),np('mt')],
+ [np('mt'),np('yx')]
+];
+const SIDE_PATH_LQ=[np('ys'),[480,755],[830,660],[1090,470],np('lq')];
+const RETURN_PATH=[np('zy'),np('gy'),[270.6,384.0],[603,322],[900,240],np('hz')];
+
+function smoothPath(pts){
+  if(pts.length<2)return '';
+  let d=`M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    const c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6;
+    const c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+    d+=` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+
+/* ================= 静态地图（纸底 / 海 / 山 / 河 / 省名） ================= */
+function buildBase(){
+  let s='';
+  /* 纸底 */
+  s+=`<defs>
+    <radialGradient id="paperG" cx="45%" cy="38%" r="80%">
+      <stop offset="0" stop-color="#f6ecd4"/><stop offset="55%" stop-color="#efe2c2"/><stop offset="100%" stop-color="#e2cfa4"/>
+    </radialGradient>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.38  0 0 0 0 0.25  0 0 0 0.05 0"/>
+    </filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="1.2"/></filter>
+  </defs>
+  <rect width="${MAPW}" height="${MAPH}" fill="url(#paperG)"/>
+  <rect width="${MAPW}" height="${MAPH}" filter="url(#grain)"/>`;
+  /* 海 */
+  const coast=[[1148,0],P(121.0,30.95),[1337,86],P(120.5,30.4),P(120.7,30.0),P(121.5,29.5),P(121.8,29.0),
+    P(121.2,28.3),P(120.4,27.4),P(120.2,26.9),P(120.6,26.4),P(119.8,25.6),P(118.8,24.9),P(117.6,23.9),[1320,800],[1320,0],[1148,0]];
+  let cd='M '+coast.map(p=>`${p[0].toFixed(0)} ${p[1].toFixed(0)}`).join(' L ');
+  s+=`<path d="${cd}" fill="#bcd3cd" opacity="0.5"/>`;
+  s+=`<path d="M 1148 0 L ${coast.slice(1,-3).map(p=>`${p[0].toFixed(0)} ${p[1].toFixed(0)}`).join(' L ')}" fill="none" stroke="#7fa097" stroke-width="1.6" opacity=".8"/>`;
+  s+=`<text class="sealabel" x="1188" y="330" transform="rotate(8 1188 330)">東 海</text>`;
+  /* 山脉簇 */
+  function peak(cx,cy,w,h){return `M ${cx-w} ${cy} Q ${cx-w*0.45} ${cy-h*0.72} ${cx} ${cy-h} Q ${cx+w*0.45} ${cy-h*0.72} ${cx+w} ${cy} Z`;}
+  function cluster(lon,lat,n,sx,sy,w,h,seed,op,karst){
+    const cx=px(lon),cy=py(lat),r=mulberry32(seed);let d='';
+    for(let i=0;i<n;i++){
+      const x=cx+(r()*2-1)*sx, y=cy+(r()*2-1)*sy;
+      const ww=(karst?w*(0.5+r()*0.7):w*(0.6+r()*0.9)), hh=(karst?h*(1.4+r()*1.2):h*(0.6+r()*0.9));
+      d+=peak(x,y,ww,hh);
+    }
+    return `<path d="${d}" fill="${karst?'#7b8a6a':'#6d7a5c'}" opacity="${op}" filter="url(#soft)"/>`;
+  }
+  s+=cluster(119.45,30.35,4,26,12,16,15,11,.20,false);           /* 天目山 */
+  s+=cluster(120.0,28.6,5,34,26,16,16,22,.16,false);              /* 浙南山地 */
+  s+=cluster(117.8,27.6,9,26,66,15,17,33,.18,false);              /* 武夷山 */
+  s+=cluster(116.0,26.2,6,50,26,15,15,44,.16,false);              /* 赣南山地 */
+  s+=cluster(114.1,26.5,7,44,30,15,16,55,.17,false);              /* 罗霄山 */
+  s+=cluster(111.6,27.2,7,40,52,15,17,66,.17,false);              /* 雪峰山 */
+  s+=cluster(112.6,25.2,6,44,26,14,15,77,.15,false);              /* 南岭 */
+  s+=cluster(109.3,24.6,11,86,42,7,14,88,.30,true);               /* 桂黔喀斯特 */
+  s+=cluster(107.0,25.9,10,64,44,7,13,99,.28,true);               /* 黔南喀斯特 */
+  s+=cluster(106.6,28.1,6,50,22,14,16,111,.18,false);             /* 大娄山 */
+  s+=cluster(115.4,28.6,5,40,22,14,14,122,.14,false);             /* 赣北丘陵 */
+  s+=cluster(110.8,29.3,6,44,24,15,15,133,.14,false);             /* 湘西丘陵 */
+  /* 河流 */
+  function river(pts,lab,lx,ly){
+    const d=smoothPath(pts.map(p=>Array.isArray(p)&&p.length===2&&p[0]>100?p:P(p[0],p[1])));
+    let r=`<path d="${d}" fill="none" stroke="#7fa8a0" stroke-width="2" opacity=".55" stroke-linecap="round"/>`;
+    if(lab)r+=`<text class="rlabel" x="${lx}" y="${ly}">${lab}</text>`;
+    return r;
+  }
+  s+=river([[105.7,30.1],[109.5,30.3],[112.5,30.5],[114.4,30.6],[116.1,29.8],[118.3,31.3],[119.4,31.6]],'長江',392,112);
+  s+=river([[118.9,29.4],[119.6,29.9],[120.2,30.3],[120.5,30.4]],'錢塘江',1096,196);
+  s+=river([[114.6,25.9],[114.95,26.9],[115.2,27.6],[115.9,28.7],[116.2,29.2]],'贛江',784,415);
+  s+=river([[111.6,25.5],[112.6,26.9],[113.1,27.8],[112.95,28.25],[113.0,29.4]],'湘江',590,430);
+  s+=river([[107.4,25.3],[108.6,24.55],[109.5,24.35]],'柳江',214,706);
+  s+=river([[105.75,27.0],[106.7,27.5],[107.9,28.3],[108.7,28.9]],'烏江',42,428);
+  s+=river([[107.25,27.3],[107.5,27.8],[107.65,28.3]],'湄江',132,344);
+  /* 省名装饰 */
+  const provs=[['浙',119.9,28.2],['贛',115.9,27.7],['湘',111.2,26.3],['粵',113.4,23.9],['桂',109.7,24.0],['黔',106.0,25.3]];
+  provs.forEach(([c,lon,lat])=>{s+=`<text class="provlabel" x="${px(lon).toFixed(0)}" y="${py(lat).toFixed(0)}">${c}</text>`;});
+  /* 途经点小站 */
+  WAYPOINTS.forEach(w=>{
+    s+=`<circle cx="${w.x}" cy="${w.y}" r="2.6" fill="#8a7450" opacity=".75"/>`;
+    s+=`<text class="wplabel" x="${w.x+6}" y="${w.y+3.5}">${w.n}</text>`;
+  });
+  return s;
+}
+
+/* ================= 状态 ================= */
+const state={
+  unlocked:new Set(['hz']), completed:new Set(), km:0, current:null,
+  tab:'hist', returnReady:false, returned:false
+};
+let dlgState=null, walkAnim=null;
+
+/* ================= 地图渲染 ================= */
+const svg=$('#map');
+function buildMap(){
+  let s=buildBase();
+  s+='<g id="routes">';
+  SEGMENTS.forEach((seg,i)=>{
+    s+=`<path id="seg${i}" class="routeBase" d="${smoothPath(seg)}" fill="none" stroke="#b6a884" stroke-width="2.6" stroke-dasharray="3 7" stroke-linecap="round" opacity=".85"/>`;
+    s+=`<path id="segw${i}" class="routeWalk" d="${smoothPath(seg)}" fill="none" stroke="#a83a2a" stroke-width="3.4" stroke-linecap="round" opacity=".9"/>`;
+  });
+  s+=`<path id="segLQ" d="${smoothPath(SIDE_PATH_LQ)}" fill="none" stroke="#9a8a68" stroke-width="2.2" stroke-dasharray="7 6" opacity="0"/>`;
+  s+=`<path id="segRet" d="${smoothPath(RETURN_PATH)}" fill="none" stroke="#5f7a64" stroke-width="3" stroke-dasharray="10 8" opacity="0"/>`;
+  s+='</g><g id="nodes">';
+  NODES.forEach(n=>{
+    const [x,y]=P(n.lon,n.lat);
+    const shape = n.type==='side'
+      ? `<path class="ring" d="M 0 -10 L 10 0 L 0 10 L -10 0 Z"/>`
+      : `<circle class="pulse" r="13"/><circle class="ring" r="9"/>`;
+    s+=`<g class="node ${n.type==='side'?'side ':''}locked" id="node-${n.id}" data-id="${n.id}" transform="translate(${x.toFixed(1)},${y.toFixed(1)})">
+      ${shape}<circle class="dot" r="4"/></g>
+      <text class="nlabel" x="${(x+n.lab.dx).toFixed(1)}" y="${(y+n.lab.dy).toFixed(1)}" text-anchor="${n.lab.anchor}" id="lab-${n.id}">${n.name}</text>`;
+  });
+  s+='</g>';
+  svg.innerHTML=s;
+  /* 初始化已走线段隐藏 */
+  SEGMENTS.forEach((seg,i)=>{hidePath($('#segw'+i));});
+  svg.addEventListener('click',ev=>{
+    const g=ev.target.closest('g.node'); if(!g)return;
+    const id=g.dataset.id;
+    if(state.unlocked.has(id)){ sfxClick(); openNode(id); }
+    else { sfxWrong(); toast('此地尚未解锁——先完成前一站的「求是问答」吧'); g.style.animation='none'; void g.offsetWidth; }
+  });
+}
+function hidePath(p){const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;}
+function drawPath(p,dur,onDone){
+  const L=p.getTotalLength();
+  p.style.strokeDasharray=L;p.style.strokeDashoffset=L;
+  const t0=performance.now();
+  const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('r','5');dot.setAttribute('fill','#c0492f');dot.setAttribute('opacity','.95');
+  const glow=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  glow.setAttribute('r','10');glow.setAttribute('fill','#c0492f');glow.setAttribute('opacity','.25');
+  svg.appendChild(glow);svg.appendChild(dot);
+  let lastStep=0;
+  function frame(t){
+    const k=Math.min(1,(t-t0)/dur);
+    p.style.strokeDashoffset=L*(1-k);
+    const pt=p.getPointAtLength(L*k);
+    dot.setAttribute('cx',pt.x);dot.setAttribute('cy',pt.y);
+    glow.setAttribute('cx',pt.x);glow.setAttribute('cy',pt.y);
+    if(k-lastStep>0.09){lastStep=k;sfxStep();}
+    if(k<1){walkAnim=requestAnimationFrame(frame);}
+    else{dot.remove();glow.remove();walkAnim=null;if(onDone)onDone();}
+  }
+  walkAnim=requestAnimationFrame(frame);
+}
+
+/* ================= 面板 ================= */
+const content=$('#content');
+function renderJourney(){
+  const list=$('#journeyList');
+  list.innerHTML=JOURNEY_ORDER.map((id,idx)=>{
+    const n=byId[id];
+    const cls=[n.type==='side'?'side':'',state.completed.has(id)?'done':'',
+      (state.unlocked.has(id)&&!state.completed.has(id))?'active':'',
+      !state.unlocked.has(id)?'locked':''].join(' ').trim();
+    const dot=state.completed.has(id)?n.stamp[0]:(state.unlocked.has(id)?(n.type==='side'?'✦':'●'):'锁');
+    return `<div class="jitem ${cls}" data-id="${id}">
+      <div class="jdot">${dot}</div>
+      <div class="jinfo"><b>${n.name}</b><span>${n.year} · ${n.sub.split(' · ')[n.sub.split(' · ').length-1]}</span></div>
+      <div class="jkm">${n.km?('+'+n.km+'km'):(n.type==='side'?'支线':'起点')}</div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.jitem').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const id=el.dataset.id;
+      if(state.unlocked.has(id)){sfxClick();openNode(id);}
+      else{toast('尚未解锁：先完成前一站的问答');}
+    });
+  });
+}
+function renderWelcome(){
+  content.innerHTML=`<div class="pbody"><div class="welcome">
+    <div class="wseal">求是</div>
+    <h3>文军长征 · 浙江大学西迁</h3>
+    <p>1937—1946年，竺可桢校长率浙大师生举校西迁：一迁建德梅城，二迁江西泰和，三迁广西宜山，终迁贵州遵义、湄潭、永兴，跋涉2600余公里，坚持办学九年，被誉为「文军长征」。</p>
+    <p class="howto">🎮 点击地图上<b class="hl">闪烁的红色地点</b>开始探索：读史海档案 → 演情景对话 → 答求是问答 → 盖印章、解锁下一站。集齐九枚印章，完成凯旋回杭！</p>
+  </div></div>`;
+}
+function openNode(id){
+  const n=byId[id];
+  state.current=id; state.tab='hist';
+  $('#hudYear').textContent=n.year;
+  $('#mapHint').style.opacity=0;
+  NODES.forEach(m=>{
+    const g=$('#node-'+m.id);
+    if(state.unlocked.has(m.id))g.classList.remove('locked');
+    g.classList.toggle('open', m.id===id && !state.completed.has(m.id));
+  });
+  renderJourney();
+  renderNodePanel(n);
+}
+function renderNodePanel(n){
+  const done=state.completed.has(n.id);
+  content.innerHTML=`
+  <div class="phead">
+    <div class="phead-top">
+      <div><h2>${n.name}</h2><div class="psub">${n.sub} · ${n.year}</div></div>
+      <div class="pseal ${done?'earned':''}" id="pseal">${n.stamp}</div>
+    </div>
+    <div class="tabs">
+      <button data-tab="hist" class="${state.tab==='hist'?'active':''}">史海档案</button>
+      <button data-tab="dlg" class="${state.tab==='dlg'?'active':''}">情景对话</button>
+      <button data-tab="quiz" class="${state.tab==='quiz'?'active':''}">求是问答</button>
+    </div>
+  </div>
+  <div class="pbody" id="pbody"></div>`;
+  content.querySelectorAll('.tabs button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      sfxClick(); state.tab=b.dataset.tab;
+      content.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x===b));
+      renderTab(n);
+    });
+  });
+  renderTab(n);
+}
+function renderTab(n){
+  stopDlg();
+  const body=$('#pbody');
+  if(state.tab==='hist'){
+    body.innerHTML=`<div class="hist-list">${n.hist.map(h=>
+      `<div class="hist-item"><div class="hist-t">${h.t}</div><div class="hist-s">${h.s}</div></div>`).join('')}</div>
+      <div class="srcnote">📖 史料整理自浙江大学官网、中文维基百科「国立浙江大学西迁」条目、抗战纪念网等公开资料。</div>`;
+  }else if(state.tab==='dlg'){
+    body.innerHTML=`<div class="dlg-note">🎭 情景演绎 · 依据史料改编（人物对白为艺术再现）</div>
+      <div class="dlg-stage" id="dlgStage">
+        <div class="dlg-speaker" id="dlgSpeaker"></div>
+        <div class="dlg-text" id="dlgText"></div>
+        <div class="dlg-hint" id="dlgHint">点击继续 ▼</div>
+      </div>
+      <div class="dlg-foot">
+        <span class="dlg-progress" id="dlgProg"></span>
+        <button class="btn-mini" id="dlgSkip">⏩ 跳过全部</button>
+        <button class="btn-mini" id="dlgReplay">↺ 重播</button>
+      </div>`;
+    startDlg(n);
+  }else{
+    body.innerHTML=`<div class="quiz-tag">求 是 问 答</div>
+      <div class="quiz-q">${n.quiz.q}</div>
+      <div id="quizOpts">${n.quiz.opts.map((o,i)=>
+        `<button class="quiz-opt" data-i="${i}">${'甲乙丙'[i]}. ${o}</button>`).join('')}</div>
+      <div class="quiz-exp" id="quizExp">✅ ${n.quiz.exp}</div>
+      ${state.completed.has(n.id)?'<div class="srcnote">此地印章已收入行囊。</div>':''}`;
+    body.querySelectorAll('.quiz-opt').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const i=+btn.dataset.i;
+        if(i===n.quiz.ans){
+          btn.classList.add('right'); sfxRight();
+          $('#quizExp').classList.add('show');
+          body.querySelectorAll('.quiz-opt').forEach(b=>b.style.pointerEvents='none');
+          if(!state.completed.has(n.id)) setTimeout(()=>completeNode(n.id),350);
+        }else{
+          btn.classList.add('wrong'); sfxWrong();
+          setTimeout(()=>btn.classList.remove('wrong'),420);
+          toast('再想想——先去翻翻「史海档案」与「情景对话」？');
+        }
+      });
+    });
+  }
+}
+
+/* ================= 情景对话（打字机） ================= */
+function stopDlg(){ if(dlgState&&dlgState.timer){clearInterval(dlgState.timer);} dlgState=null; }
+function startDlg(n){
+  dlgState={lines:n.dlg,i:0,ci:0,timer:null,finished:false};
+  $('#dlgStage').addEventListener('click',dlgAdvance);
+  $('#dlgReplay').addEventListener('click',e=>{e.stopPropagation();stopDlg();startDlg(n);sfxClick();});
+  $('#dlgSkip').addEventListener('click',e=>{e.stopPropagation();dlgSkipAll();});
+  dlgShowLine();
+}
+function dlgShowLine(){
+  const d=dlgState; if(!d)return;
+  const line=d.lines[d.i];
+  $('#dlgSpeaker').textContent=line.sp;
+  $('#dlgSpeaker').classList.toggle('narr',line.sp==='旁白');
+  $('#dlgText').innerHTML='';
+  $('#dlgProg').textContent=`第 ${d.i+1} / ${d.lines.length} 幕`;
+  d.ci=0;
+  if(d.timer)clearInterval(d.timer);
+  d.timer=setInterval(()=>{
+    d.ci++;
+    $('#dlgText').innerHTML=line.tx.slice(0,d.ci)+'<span class="cursor">.</span>';
+    if(d.ci%3===0)sfxType();
+    if(d.ci>=line.tx.length){clearInterval(d.timer);d.timer=null;$('#dlgText').textContent=line.tx;}
+  },42);
+}
+function dlgAdvance(){
+  const d=dlgState; if(!d||d.finished)return;
+  const line=d.lines[d.i];
+  if(d.timer){ /* 打字中→直接补全 */
+    clearInterval(d.timer);d.timer=null;d.ci=line.tx.length;$('#dlgText').textContent=line.tx;return;
+  }
+  if(d.i<d.lines.length-1){d.i++;sfxClick();dlgShowLine();}
+  else{
+    d.finished=true;
+    $('#dlgText').innerHTML=line.tx+`<div style="margin-top:14px;font-size:12px;color:#c9b58a;letter-spacing:2px;">── 情景结束 · 前往「求是问答」盖章吧 ──</div>`;
+    $('#dlgHint').style.display='none';
+    tone(523,0.1,'sine',0.08);tone(784,0.15,'sine',0.08,0.1);
+  }
+}
+function dlgSkipAll(){
+  const d=dlgState; if(!d)return;
+  if(d.timer){clearInterval(d.timer);d.timer=null;}
+  d.i=d.lines.length-1;d.finished=true;
+  const line=d.lines[d.i];
+  $('#dlgSpeaker').textContent=line.sp;
+  $('#dlgSpeaker').classList.toggle('narr',line.sp==='旁白');
+  $('#dlgText').innerHTML=line.tx+`<div style="margin-top:14px;font-size:12px;color:#c9b58a;letter-spacing:2px;">── 情景结束 · 前往「求是问答」盖章吧 ──</div>`;
+  $('#dlgProg').textContent=`第 ${d.lines.length} / ${d.lines.length} 幕`;
+  $('#dlgHint').style.display='none';
+}
+
+/* ================= 完成 / 解锁 / 印章 ================= */
+function completeNode(id){
+  const n=byId[id];
+  state.completed.add(id);
+  state.km+=n.km;
+  animateKm(state.km);
+  stampFx(n.stamp); sfxStamp();
+  $('#pseal')&&$('#pseal').classList.add('earned');
+  const g=$('#node-'+id);
+  g.classList.remove('open');g.classList.add('done');
+  updateSeals();
+  renderJourney();
+  if(n.type==='main'){
+    const mi=MAIN_ORDER.indexOf(id);
+    if(mi<MAIN_ORDER.length-1){
+      const next=MAIN_ORDER[mi+1];
+      setTimeout(()=>unlockWithWalk(mi,next),700);
+    }else{
+      /* 主线全部完成 */
+      setTimeout(()=>{
+        state.returnReady=true;
+        $('#btnReturn').style.display='block';
+        toast('1945年8月，抗战胜利！点击「凯旋回杭」完成征程');
+        sfxUnlock();
+      },700);
+    }
+  }else{
+    toast(`支线完成！获得印章「${n.stamp}」`);
+  }
+}
+function unlockWithWalk(segIdx,nextId){
+  const p=$('#segw'+segIdx);
+  const L=p.getTotalLength();
+  const dur=Math.max(1400,Math.min(3600,L*4));
+  drawPath(p,dur,()=>{
+    state.unlocked.add(nextId);
+    const g=$('#node-'+nextId);
+    g.classList.remove('locked');g.classList.add('open');
+    sfxUnlock();
+    renderJourney();
+    toast(`抵达「${byId[nextId].name}」——点击地图地点开始探索`);
+    setTimeout(()=>openNode(nextId),400);
+  });
+}
+function unlockSide(sideId){
+  if(state.unlocked.has(sideId))return;
+  state.unlocked.add(sideId);
+  const g=$('#node-'+sideId);
+  g.classList.remove('locked');g.classList.add('open');
+  if(sideId==='lq'){
+    const p=$('#segLQ');p.style.opacity='.8';
+    const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;
+    p.style.transition='stroke-dashoffset 1.8s ease';
+    requestAnimationFrame(()=>{p.style.strokeDashoffset=0;});
+  }
+  renderJourney();sfxUnlock();
+  toast(`发现支线「${byId[sideId].name}」！`);
+}
+function stampFx(word){
+  const fx=$('#stampFx');
+  fx.innerHTML=`<div class="big">${word}</div>`;
+  setTimeout(()=>{fx.innerHTML='';},1000);
+}
+function updateSeals(){
+  $('#hudSeals').textContent=`${state.completed.size} / 9`;
+}
+function animateKm(target){
+  const el=$('#hudKm');
+  const start=parseInt(el.dataset.v||'0',10);
+  const t0=performance.now(),dur=900;
+  function f(t){
+    const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);
+    const v=Math.round(start+(target-start)*e);
+    el.textContent=v+' km';el.dataset.v=v;
+    if(k<1)requestAnimationFrame(f);
+  }
+  requestAnimationFrame(f);
+}
+
+/* ================= 结局 ================= */
+$('#btnReturn').addEventListener('click',()=>{
+  if(state.returned)return;
+  sfxClick();
+  const p=$('#segRet');
+  p.style.opacity='.9';
+  const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;
+  drawPath(p,2800,()=>{
+    p.style.strokeDasharray='10 8';p.style.strokeDashoffset='0';
+    state.returned=true;
+    showEnd();
+  });
+});
+function showEnd(){
+  sfxRight();tone(1047,0.3,'sine',0.1,0.3);
+  $('#endSeals').textContent=`${state.completed.size} / 9`;
+  $('#endStamps').innerHTML=NODES.map(n=>
+    `<div class="ostamp ${state.completed.has(n.id)?'':'dim'}">${n.stamp}</div>`).join('');
+  $('#endOverlay').classList.remove('hidden');
+}
+$('#btnAgain').addEventListener('click',()=>location.reload());
+$('#btnCloseEnd').addEventListener('click',()=>{$('#endOverlay').classList.add('hidden');});
+
+/* ================= 杂项 ================= */
+let toastTimer=null;
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+}
+$('#btnSound').addEventListener('click',()=>{
+  soundOn=!soundOn;
+  $('#btnSound').textContent=soundOn?'🔔 音效':'🔕 静音';
+  if(soundOn)sfxClick();
+});
+$('#btnHelp').addEventListener('click',()=>{sfxClick();$('#helpOverlay').classList.remove('hidden');});
+$('#btnCloseHelp').addEventListener('click',()=>{sfxClick();$('#helpOverlay').classList.add('hidden');});
+$('#btnRestart').addEventListener('click',()=>{if(confirm('确定重走一遍西迁路？当前进度将清空。'))location.reload();});
+$('#btnStart').addEventListener('click',()=>{
+  actx();sfxUnlock();
+  $('#introOverlay').classList.add('hidden');
+  setTimeout(()=>openNode('hz'),300);
+});
+
+/* ================= 初始化 ================= */
+buildMap();
+renderJourney();
+renderWelcome();
+updateSeals();
+/* 侧线解锁监听：完成泰和→贵阳地母洞；完成宜山→龙泉 */
+const origComplete=completeNode;
+completeNode=function(id){
+  origComplete(id);
+  if(id==='th')setTimeout(()=>unlockSide('gy'),1500);
+  if(id==='ys')setTimeout(()=>unlockSide('lq'),1500);
+};
+</script>
+</body>
+</html>
